@@ -60,7 +60,7 @@ class DataDriftDetector:
                 results[feature] = {
                     'ks_statistic': float(ks_statistic),
                     'p_value': float(p_value),
-                    'is_drifted': is_drifted,
+                    'is_drifted': bool(is_drifted),
                     'drift_severity': 'High' if ks_statistic > 0.3 else 'Medium' if ks_statistic > 0.15 else 'Low'
                 }
         
@@ -111,7 +111,7 @@ class DataDriftDetector:
                 
                 results[feature] = {
                     'psi': float(psi),
-                    'is_drifted': psi >= self.threshold_psi,
+                    'is_drifted': bool(psi >= self.threshold_psi),
                     'drift_status': drift_status
                 }
         
@@ -136,7 +136,7 @@ class DataDriftDetector:
             combined_results[feature] = {
                 'ks_test': ks_results[feature],
                 'psi': psi_results[feature],
-                'overall_drifted': ks_results[feature]['is_drifted'] or psi_results[feature]['is_drifted']
+                'overall_drifted': bool(ks_results[feature]['is_drifted'] or psi_results[feature]['is_drifted'])
             }
         
         # Calculate overall drift score
@@ -144,7 +144,7 @@ class DataDriftDetector:
         
         return {
             'features': combined_results,
-            'overall_drift_score': drift_score,
+            'overall_drift_score': float(drift_score),
             'drifted_features': [f for f, r in combined_results.items() if r['overall_drifted']]
         }
 

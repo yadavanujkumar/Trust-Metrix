@@ -56,14 +56,24 @@ def generate_credit_data(n_samples=10000, random_state=42):
     return data
 
 
-def train_model(save_dir='../../models'):
+def train_model(save_dir=None):
     """Train and save the credit risk model."""
+    # Get absolute paths
+    if save_dir is None:
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        project_root = os.path.dirname(os.path.dirname(script_dir))
+        save_dir = os.path.join(project_root, 'models')
+        data_dir = os.path.join(project_root, 'data')
+    else:
+        data_dir = os.path.join(os.path.dirname(save_dir), 'data')
+    
     print("Generating training data...")
     data = generate_credit_data(n_samples=10000, random_state=42)
     
     # Save training data for reference
-    os.makedirs('../../data', exist_ok=True)
-    data.to_csv('../../data/training_data.csv', index=False)
+    os.makedirs(data_dir, exist_ok=True)
+    data_path = os.path.join(data_dir, 'training_data.csv')
+    data.to_csv(data_path, index=False)
     print(f"Training data saved: {len(data)} samples")
     
     # Split features and target

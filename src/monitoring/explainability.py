@@ -67,20 +67,27 @@ class ModelExplainer:
         # Calculate SHAP values
         shap_values = self.explainer.shap_values(instance[self.feature_names])
         
-        # Handle both binary and multi-class cases
+        # Handle different SHAP output formats
         if isinstance(shap_values, list):
-            # For binary classification, use class 1 (positive class)
+            # Binary classification with list output (old format)
             shap_values_class = shap_values[1]
+        elif len(shap_values.shape) == 3:
+            # Binary classification with 3D array (new format): (samples, features, classes)
+            shap_values_class = shap_values[0, :, 1]  # Get class 1 for first sample
+        elif len(shap_values.shape) == 2:
+            # Single class or already extracted
+            shap_values_class = shap_values[0]
         else:
             shap_values_class = shap_values
         
         # Get feature contributions
         feature_contributions = {}
         for i, feature in enumerate(self.feature_names):
+            shap_val = float(shap_values_class[i])
             feature_contributions[feature] = {
                 'value': float(instance[feature].values[0]),
-                'shap_value': float(shap_values_class[0][i]),
-                'impact': 'positive' if shap_values_class[0][i] > 0 else 'negative'
+                'shap_value': shap_val,
+                'impact': 'positive' if shap_val > 0 else 'negative'
             }
         
         # Sort by absolute SHAP value
@@ -109,8 +116,10 @@ class ModelExplainer:
             },
             'feature_contributions': feature_contributions,
             'top_contributors': top_features,
-            'base_value': float(self.explainer.expected_value[1] if isinstance(self.explainer.expected_value, list) 
-                               else self.explainer.expected_value)
+            'base_value': float(self.explainer.expected_value[1] if isinstance(self.explainer.expected_value, (list, np.ndarray)) and len(self.explainer.expected_value) > 1
+                               else self.explainer.expected_value if isinstance(self.explainer.expected_value, (int, float))
+                               else self.explainer.expected_value[0] if isinstance(self.explainer.expected_value, np.ndarray)
+                               else 0.0)
         }
     
     def explain_alert(self, alert_type: str, current_data: pd.DataFrame, 
@@ -203,9 +212,16 @@ class ModelExplainer:
         # Calculate SHAP values
         shap_values = self.explainer.shap_values(sample_data)
         
-        # Handle both binary and multi-class cases
+        # Handle different SHAP output formats
         if isinstance(shap_values, list):
+            # Binary classification with list output (old format)
             shap_values_class = shap_values[1]
+        elif len(shap_values.shape) == 3:
+            # Binary classification with 3D array (new format): (samples, features, classes)
+            shap_values_class = shap_values[:, :, 1]  # Get class 1 for all samples
+        elif len(shap_values.shape) == 2:
+            # Single class or already extracted
+            shap_values_class = shap_values
         else:
             shap_values_class = shap_values
         
