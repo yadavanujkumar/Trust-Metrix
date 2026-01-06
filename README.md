@@ -274,22 +274,9 @@ FairnessAuditor(
 - **SciPy**: Statistical tests
 - **Plotly**: Interactive visualizations
 
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
 ## 📝 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- **SHAP**: For powerful model interpretability
-- **EvidentlyAI**: For inspiration on ML monitoring
-- **Fairlearn**: For fairness metrics concepts
-- **FastAPI**: For the excellent API framework
-- **Streamlit**: For rapid dashboard development
-
 ## 📧 Contact
 
 For questions or support, please open an issue on GitHub.
