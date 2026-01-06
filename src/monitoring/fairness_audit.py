@@ -16,6 +16,8 @@ class FairnessAuditor:
         
         Args:
             sensitive_features: List of demographic features to audit (e.g., ['Gender', 'Age'])
+                              Note: For continuous features like Age, the data should be 
+                              pre-binned into categories (e.g., age groups) for meaningful analysis.
             fairness_threshold: Disparate impact threshold (default: 0.8, the "80% rule")
         """
         self.sensitive_features = sensitive_features

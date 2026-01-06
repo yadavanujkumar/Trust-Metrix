@@ -149,27 +149,4 @@ class DataDriftDetector:
         }
 
 
-def generate_drifted_data(reference_data: pd.DataFrame, n_samples: int, drift_features: List[str], 
-                         drift_magnitude: float = 0.3) -> pd.DataFrame:
-    """
-    Generate drifted data for testing purposes.
-    
-    Args:
-        reference_data: Original reference data
-        n_samples: Number of samples to generate
-        drift_features: Features to introduce drift in
-        drift_magnitude: Magnitude of drift (0-1)
-        
-    Returns:
-        Drifted data
-    """
-    drifted_data = reference_data.sample(n=n_samples, replace=True, random_state=np.random.randint(1000))
-    
-    for feature in drift_features:
-        if feature in drifted_data.columns:
-            mean = drifted_data[feature].mean()
-            std = drifted_data[feature].std()
-            # Shift the distribution
-            drifted_data[feature] = drifted_data[feature] + (mean * drift_magnitude)
-    
-    return drifted_data
+

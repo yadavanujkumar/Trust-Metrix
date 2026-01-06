@@ -47,6 +47,30 @@ class ModelExplainer:
             # Default to TreeExplainer
             self.explainer = shap.TreeExplainer(self.model)
     
+    def _extract_base_value(self) -> float:
+        """
+        Extract base value from SHAP explainer, handling different formats.
+        
+        Returns:
+            Base value as float
+        """
+        expected_value = self.explainer.expected_value
+        
+        # Handle list or array with multiple classes (binary classification)
+        if isinstance(expected_value, (list, np.ndarray)) and len(expected_value) > 1:
+            return float(expected_value[1])  # Return positive class base value
+        
+        # Handle scalar
+        if isinstance(expected_value, (int, float)):
+            return float(expected_value)
+        
+        # Handle single-element array
+        if isinstance(expected_value, np.ndarray) and len(expected_value) == 1:
+            return float(expected_value[0])
+        
+        # Default fallback
+        return 0.0
+    
     def explain_prediction(self, instance: pd.DataFrame) -> Dict:
         """
         Explain a single prediction.
@@ -116,10 +140,7 @@ class ModelExplainer:
             },
             'feature_contributions': feature_contributions,
             'top_contributors': top_features,
-            'base_value': float(self.explainer.expected_value[1] if isinstance(self.explainer.expected_value, (list, np.ndarray)) and len(self.explainer.expected_value) > 1
-                               else self.explainer.expected_value if isinstance(self.explainer.expected_value, (int, float))
-                               else self.explainer.expected_value[0] if isinstance(self.explainer.expected_value, np.ndarray)
-                               else 0.0)
+            'base_value': self._extract_base_value()
         }
     
     def explain_alert(self, alert_type: str, current_data: pd.DataFrame, 
